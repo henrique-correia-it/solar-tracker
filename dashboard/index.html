@@ -1,0 +1,2149 @@
+﻿<!DOCTYPE html>
+<html lang="pt-PT">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Sistema de Seguidor Solar IoT com monitorização em tempo real e controlo PID" />
+  <title>Relatório do Projeto: Seguidor Solar IoT</title>
+
+  <link rel="icon" type="image/x-icon" href="assets/Logo_solar_tracker.ico" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@500;700;800&family=Fira+Code:wght@400;600&display=swap"
+    rel="stylesheet" />
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/polyfill-service/3.111.0/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+
+  <style>
+
+    .night-badge {
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      color: #1e293b;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    .night-badge i {
+      color: #3b82f6;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="#" class="logo">
+        <img src="assets/Logo_solar_tracker.png" alt="Logo Solar Tracker" class="logo-img" />
+        <span>Solar<span class="accent">Tracker</span></span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#intro">Introdução</a></li>
+        <li><a href="#architecture">Arquitetura</a></li>
+        <li><a href="#hardware-details">Hardware</a></li>
+        <li><a href="#engineering-hub">Software</a></li>
+        <li><a href="#thingspeak">Resultados</a></li>
+        <li><a href="#conclusions">Conclusões</a></li>
+        <li><a href="#references">Referências</a></li>
+      </ul>
+
+      <div class="mobile-toggle">
+        <i class="fas fa-bars"></i>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-bg-pattern"></div>
+    <div class="hero-glow"></div>
+
+    <div class="container hero-content">
+      <h1 class="fade-in">
+        Rastreamento Solar <br />
+        <span class="gradient-text">Autónomo & Inteligente</span>
+      </h1>
+
+      <p class="subtitle fade-in">
+        Sistema IoT de eixo duplo com controlo PID Híbrido, monitorização ambiental em tempo real e gestão remota.
+      </p>
+
+      <div class="hero-actions fade-in">
+        <a href="#thingspeak" class="btn btn-primary btn-glow">
+          <i class="fas fa-chart-line"></i> Ver Resultados
+        </a>
+        <a href="#engineering-hub" class="btn btn-outline">
+          <i class="fas fa-book-open"></i> Relatório Técnico
+        </a>
+      </div>
+
+      <div class="hero-stats fade-in">
+        <div class="stat-item">
+          <div class="stat-icon-bg"><i class="fas fa-arrows-alt"></i></div>
+          <div>
+            <span class="stat-value">2</span>
+            <span class="stat-label">Eixos</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon-bg"><i class="fas fa-wifi"></i></div>
+          <div>
+            <span class="stat-value">IoT</span>
+            <span class="stat-label">Conectado</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon-bg"><i class="fas fa-microchip"></i></div>
+          <div>
+            <span class="stat-value">AVR</span>
+            <span class="stat-label">ATmega328P</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section id="intro" class="section fade-in">
+      <div class="section-header">
+        <h2>O Problema & A Solução</h2>
+        <div class="line"></div>
+      </div>
+      <div class="grid-2 problem-solution-grid">
+        <div class="card intro-card problem-card-premium">
+          <div class="intro-card-header">
+            <div class="intro-icon-wrapper danger-gradient">
+              <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="intro-badge danger">O Desafio</div>
+          </div>
+
+          <div class="intro-content">
+            <h3>Desperdício Energético</h3>
+            <div class="intro-stat gradient-text-danger">40%</div>
+            <p class="intro-desc">
+              Painéis solares fixos perdem quase metade da energia potencial.
+              Sem movimento, a incidência solar oblíqua reduz drasticamente a eficiência durante a manhã e tarde.
+            </p>
+          </div>
+
+          <div class="intro-footer">
+            <div class="mini-stat">
+              <i class="fas fa-times-circle text-danger"></i>
+              <span>Estático</span>
+            </div>
+            <div class="mini-stat">
+              <i class="fas fa-battery-quarter text-danger"></i>
+              <span>Baixa Eficiência</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card intro-card solution-card-premium">
+          <div class="intro-card-header">
+            <div class="intro-icon-wrapper success-gradient">
+              <i class="fas fa-solar-panel"></i>
+            </div>
+            <div class="intro-badge success">A Solução</div>
+          </div>
+
+          <div class="intro-content">
+            <h3>Rastreamento Ativo</h3>
+            <div class="intro-stat gradient-text-success">+45%</div>
+            <p class="intro-desc">
+              Um sistema automatizado de Eixo Duplo que segue o sol com precisão.
+              Garante incidência perpendicular constante, maximizando a captação de fotões o dia todo.
+            </p>
+          </div>
+
+          <div class="intro-footer">
+            <div class="mini-stat">
+              <i class="fas fa-check-circle text-success"></i>
+              <span>Dinâmico</span>
+            </div>
+            <div class="mini-stat">
+              <i class="fas fa-bolt text-success"></i>
+              <span>Eficiência Máxima</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+      <div style="text-align: center; margin-top: 15px; font-size: 0.8rem; color: var(--text-muted); opacity: 0.8;">
+        <i class="fas fa-info-circle"></i> <em>Dados baseados em estudos comparativos de eficiência (Single vs. Dual
+          Axis Tracking), indicando ganhos médios de 35-45% em sistemas de eixo duplo.</em>
+      </div>
+    </section>
+
+    <section id="architecture" class="section fade-in">
+      <div class="section-header">
+        <h2>Arquitetura do Sistema</h2>
+        <div class="line"></div>
+      </div>
+
+      <div class="architecture-tabs" style="display: flex; justify-content: center; gap: 20px; margin-bottom: 40px;">
+        <button class="btn btn-outline active" id="tab-wifi" onclick="switchArchitecture('wifi')">
+          <i class="fas fa-wifi"></i> V2.0 Wi-Fi
+        </button>
+        <button class="btn btn-outline" id="tab-bt" onclick="switchArchitecture('bt')">
+          <i class="fab fa-bluetooth-b"></i> V1.0 Bluetooth
+        </button>
+      </div>
+
+      <div class="pcb-container">
+        <div class="pcb-grid-bg"></div>
+
+        <div id="arch-view-wifi" class="pipeline-wrapper fade-in">
+          <div class="pipeline-col inputs-col" style="margin-top: -60px; gap: 15px;">
+            <span class="col-badge">INPUTS</span>
+
+            <div class="arch-card sensor-card">
+              <div class="card-body">
+                <div class="arch-icon"><i class="fas fa-sun"></i></div>
+                <div class="arch-text"><strong>4x LDRs</strong><small>Light-Dependent Resistor</small></div>
+              </div>
+              <div class="trace-line right">
+                <div class="packet-flow"></div>
+              </div>
+            </div>
+
+            <div class="arch-card sensor-card">
+              <div class="card-body">
+                <div class="arch-icon"><i class="fas fa-temperature-high"></i></div>
+                <div class="arch-text"><strong>DHT22</strong><small>Temp. & Humidade</small></div>
+              </div>
+              <div class="trace-line right">
+                <div class="packet-flow delay-1"></div>
+              </div>
+            </div>
+
+            <div class="arch-card sensor-card">
+              <div class="card-body">
+                <div class="arch-icon" style="background: #fffbeb; color: #f59e0b;">
+                  <i class="fas fa-bolt"></i>
+                </div>
+                <div class="arch-text"><strong>INA219</strong><small>Potência Solar</small></div>
+              </div>
+              <div class="trace-line right">
+                <div class="packet-flow delay-2"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pipeline-col core-col">
+            <div class="mcu-package">
+              <div class="mcu-pins left-pins"></div>
+              <div class="mcu-body">
+                <div class="mcu-notch"></div>
+                <div class="mcu-label"><span>ATMEL</span><strong>ATmega328P</strong></div>
+                <div class="status-led"></div>
+              </div>
+              <div class="mcu-pins right-pins"></div>
+            </div>
+            <div class="mcu-shadow"></div>
+          </div>
+
+          <div class="pipeline-col outputs-col">
+            <span class="col-badge">OUTPUTS & IOT</span>
+            <div class="arch-card actuator-card">
+              <div class="trace-line left">
+                <div class="packet-flow"></div>
+              </div>
+              <div class="card-body">
+                <div class="arch-icon"><i class="fas fa-robot"></i></div>
+                <div class="arch-text"><strong>2x Servos</strong><small>Pan & Tilt (PWM)</small></div>
+              </div>
+            </div>
+
+            <div class="iot-group">
+              <div class="arch-card comms-card" style="border-color: var(--accent);">
+                <div class="trace-line left">
+                  <div class="packet-flow delay-2"></div>
+                </div>
+                <div class="card-body">
+                  <div class="arch-icon" style="background: #e0f2fe; color: #0284c7;">
+                    <i class="fas fa-wifi"></i>
+                  </div>
+                  <div class="arch-text">
+                    <strong>ESP8266</strong>
+                    <small>MQTT Gateway</small>
+                  </div>
+                </div>
+                <div class="trace-line down">
+                  <div class="packet-flow vertical"></div>
+                </div>
+              </div>
+
+              <div class="arch-card cloud-card">
+                <div class="card-body">
+                  <div class="arch-icon"><i class="fas fa-cloud"></i></div>
+                  <div class="arch-text">
+                    <strong>HiveMQ / TS</strong>
+                    <small>Cloud Broker</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="arch-view-bt" class="pipeline-wrapper fade-in" style="display: none;">
+          <div class="pipeline-col inputs-col">
+            <span class="col-badge">INPUTS</span>
+            <div class="arch-card sensor-card" style="opacity: 0.8;">
+              <div class="card-body">
+                <div class="arch-icon"><i class="fas fa-sun"></i></div>
+                <div class="arch-text"><strong>4x LDRs</strong><small>Light-Dependent Resistor</small></div>
+              </div>
+              <div class="trace-line right">
+                <div class="packet-flow"></div>
+              </div>
+            </div>
+            <div class="arch-card sensor-card" style="opacity: 0.8;">
+              <div class="card-body">
+                <div class="arch-icon"><i class="fas fa-temperature-high"></i></div>
+                <div class="arch-text"><strong>DHT22</strong><small>Temp. & Humidade</small></div>
+              </div>
+              <div class="trace-line right">
+                <div class="packet-flow delay-1"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pipeline-col core-col">
+            <div class="mcu-package" style="filter: grayscale(0.3);">
+              <div class="mcu-pins left-pins"></div>
+              <div class="mcu-body">
+                <div class="mcu-notch"></div>
+                <div class="mcu-label"><span>ATMEL</span><strong>ATmega328P</strong></div>
+                <div class="status-led"></div>
+              </div>
+              <div class="mcu-pins right-pins"></div>
+            </div>
+            <div class="mcu-shadow"></div>
+          </div>
+
+          <div class="pipeline-col outputs-col">
+            <span class="col-badge">OUTPUTS & COMMS</span>
+            <div class="arch-card actuator-card" style="opacity: 0.8;">
+              <div class="trace-line left">
+                <div class="packet-flow"></div>
+              </div>
+              <div class="card-body">
+                <div class="arch-icon"><i class="fas fa-robot"></i></div>
+                <div class="arch-text"><strong>2x Servos</strong><small>Pan & Tilt (PWM)</small></div>
+              </div>
+            </div>
+
+            <div class="iot-group">
+              <div class="arch-card comms-card">
+                <div class="trace-line left">
+                  <div class="packet-flow delay-2"></div>
+                </div>
+                <div class="card-body">
+                  <div class="arch-icon"><i class="fab fa-bluetooth-b"></i></div>
+                  <div class="arch-text">
+                    <strong>HC-05</strong>
+                    <small>Serial UART</small>
+                  </div>
+                </div>
+                <div class="trace-line down">
+                  <div class="packet-flow vertical"></div>
+                </div>
+              </div>
+
+              <div class="arch-card python-card">
+                <div class="card-body">
+                  <div class="arch-icon"><i class="fab fa-python"></i></div>
+                  <div class="arch-text">
+                    <strong>PC Gateway</strong>
+                    <small>Script Python</small>
+                  </div>
+                </div>
+                <div class="trace-line down">
+                  <div class="packet-flow vertical"></div>
+                </div>
+              </div>
+
+              <div class="arch-card cloud-card">
+                <div class="card-body">
+                  <div class="arch-icon"><i class="fas fa-cloud"></i></div>
+                  <div class="arch-text">
+                    <strong>ThingSpeak</strong>
+                    <small>Dashboard HTTP</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="functionality" class="section fade-in">
+      <div class="section-header">
+        <h2>Funcionalidades Detalhadas</h2>
+        <div class="line"></div>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="icon-wrapper">
+            <i class="fas fa-brain feature-icon"></i>
+          </div>
+          <h4>Rastreamento Híbrido</h4>
+          <p>
+            Algoritmo PID com zona morta dinâmica. Prioriza precisão em dias nublados e estabilidade (anti-jitter) sob
+            sol forte.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="icon-wrapper">
+            <i class="fas fa-gamepad feature-icon"></i>
+          </div>
+          <h4>Controlo Remoto Global</h4>
+          <p>
+            Controlo manual via Web Dashboard (MQTT).
+            <br><span class="highlight-upgrade">Upgrade V2.0:</span> Supera o
+            antigo controlo Bluetooth (V1), permitindo agora operar o painel de qualquer lugar, sem limites de alcance
+            físico.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="icon-wrapper">
+            <i class="fas fa-wifi feature-icon"></i>
+          </div>
+          <h4>IoT "Standalone"</h4>
+          <p>
+            O ESP8266 comunica diretamente com a Cloud.
+            <small class="note-legacy">
+              <em>(Anteriormente, na V1, isto exigia um PC a correr um script Python como ponte).</em>
+            </small>
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="icon-wrapper">
+            <i class="fas fa-thermometer-half feature-icon"></i>
+          </div>
+          <h4>Monitorização Ambiental</h4>
+          <p>
+            Leitura assíncrona do sensor DHT22 (Temperatura e Humidade) sem bloquear o loop de controlo crítico dos
+            servos.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="icon-wrapper">
+            <i class="fas fa-bolt feature-icon"></i>
+          </div>
+          <h4>Monitorização Energética</h4>
+          <p>
+            Análise em tempo real da produção solar (Tensão, Corrente e Potência) via sensor INA219.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="icon-wrapper">
+            <i class="fas fa-power-off feature-icon"></i>
+          </div>
+          <h4>Modo de Suspensão</h4>
+          <p>
+            Interrupção externa (Botão Físico) permite colocar todo o sistema em "Sleep", com o objetivo de poupar
+            energia.
+          </p>
+        </div>
+      </div>
+    </section>
+    <section id="hardware-details" class="section fade-in">
+      <div class="section-header">
+        <h2>Hardware & Especificações</h2>
+        <div class="line"></div>
+      </div>
+      <div class="hardware-grid-advanced">
+        <div class="left-col">
+          <div class="card tech-card schematic-card">
+            <div class="card-header-tech">
+              <div>
+                <h3>
+                  <i class="fas fa-microchip"></i> Esquemático do Circuito
+                </h3>
+                <p class="tech-subtitle">Placa.kikad_sch</p>
+              </div>
+              <button id="btn-expand-schematic-1" class="btn-icon-small" title="Expandir Esquemático do Circuito">
+                <i class="fas fa-expand"></i>
+              </button>
+            </div>
+            <div class="blueprint-container schematic-wrapper">
+              <div class="grid-pattern z-0"></div>
+              <img id="schematic-img-1" src="assets/schematic.compressed.svg" alt="Esquemático do Circuito"
+                class="schematic-img">
+            </div>
+          </div>
+
+          <div class="card tech-card schematic-card">
+            <div class="card-header-tech">
+              <div>
+                <h3>
+                  <i class="fas fa-layer-group"></i> Esquemático da PCB
+                </h3>
+                <p class="tech-subtitle">Placa.kikad_pcb</p>
+              </div>
+              <button id="btn-expand-schematic-2" class="btn-icon-small" title="Expandir Esquemático da PCB">
+                <i class="fas fa-expand"></i>
+              </button>
+            </div>
+            <div class="blueprint-container schematic-wrapper">
+              <img id="schematic-img-2" src="assets/esquematico_pcb.png" alt="Esquemático da PCB" class="schematic-img">
+            </div>
+          </div>
+
+          <div class="card tech-card pinout-card">
+            <div class="card-header-tech">
+              <h3>
+                <i class="fas fa-microchip"></i> Mapeamento de Pinos (IO)
+              </h3>
+            </div>
+            <div class="table-wrapper">
+              <table class="tech-table pinout-table">
+                <thead>
+                  <tr>
+                    <th>Comp.</th>
+                    <th class="text-center">PIN</th>
+                    <th>Porta MCU</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="tag tag-blue">Servo Pan</span></td>
+                    <td class="text-center"><span class="pin-chip">15</span></td>
+                    <td class="font-mono">PB1 (PWM)</td>
+                  </tr>
+                  <tr>
+                    <td><span class="tag tag-blue">Servo Tilt</span></td>
+                    <td class="text-center"><span class="pin-chip">16</span></td>
+                    <td class="font-mono">PB2 (PWM)</td>
+                  </tr>
+                  <tr>
+                    <td><span class="tag tag-orange">INA219 (I2C)</span></td>
+                    <td class="text-center"><span class="pin-chip">27/28</span></td>
+                    <td class="font-mono">PC4(SDA) / PC5(SCL)</td>
+                  </tr>
+                  <tr>
+                    <td><span class="tag tag-purple">Serial RX</span></td>
+                    <td class="text-center"><span class="pin-chip">02</span></td>
+                    <td class="font-mono">PD0 (Recebe do ESP)</td>
+                  </tr>
+                  <tr>
+                    <td><span class="tag tag-purple">Serial TX</span></td>
+                    <td class="text-center"><span class="pin-chip">03</span></td>
+                    <td class="font-mono">PD1 (Envia p/ ESP)</td>
+                  </tr>
+                  <tr class="table-note table-note-row">
+                    <td colspan="3" class="table-note-cell">
+                      <i class="fas fa-exclamation-triangle icon-warning"></i>
+                      <em>Nota: TX (03) usa divisor de tensão (1kΩ/2kΩ) p/ proteger o ESP.</em>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><span class="tag tag-green">LDR (x4)</span></td>
+                    <td class="text-center"><span class="pin-chip">23-26</span></td>
+                    <td class="font-mono">PC0 - PC3</td>
+                  </tr>
+                  <tr>
+                    <td><span class="tag tag-orange">DHT22</span></td>
+                    <td class="text-center"><span class="pin-chip">04</span></td>
+                    <td class="font-mono">PD2 (INT0)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="right-col">
+          <div class="card tech-card bom-card">
+            <div class="card-header-tech">
+              <div>
+                <h3>
+                  <i class="fas fa-clipboard-list"></i> Lista de Materiais
+                </h3>
+              </div>
+              <div class="bom-total-badge">
+                <small>Total Est.</small>
+                <span>108.81 €</span>
+              </div>
+            </div>
+            <div class="table-wrapper scrollable-bom">
+              <table class="tech-table bom-detailed">
+                <thead>
+                  <tr>
+                    <th>Item / Descrição</th>
+                    <th class="text-center">Qtd.</th>
+                    <th class="text-right">Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="category-row">
+                    <td colspan="3">1. Processamento & Controlo</td>
+                  </tr>
+                  <tr>
+                    <td><strong>ATmega328P-PU</strong><span class="spec-detail">DIP-28, 8-bit AVR</span></td>
+                    <td class="text-center">1</td>
+                    <td class="text-right">6.61 €</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Cristal Oscilador</strong><span class="spec-detail">16 MHz + 2x 22pF Cond.</span></td>
+                    <td class="text-center">1</td>
+                    <td class="text-right">0.80 €</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Programador USBasp</strong><span class="spec-detail">ISP AVR</span></td>
+                    <td class="text-center">1</td>
+                    <td class="text-right">4.50 €</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Adaptador ISP</strong><span class="spec-detail">10-pin para 6-pin (IDC)</span></td>
+                    <td class="text-center">1</td>
+                    <td class="text-right">1.20 €</td>
+                  </tr>
+
+                  <tr class="category-row">
+                    <td colspan="3">2. Atuadores, Sensores & Interface</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Servo Motor SG90</strong><span class="spec-detail">Micro Servo</span></td>
+                    <td class="text-center">2</td>
+                    <td class="text-right">6.50 €</td>
+                  </tr>
+                  <tr>
+                    <td><strong>LDR (Fotorresistência)</strong><span class="spec-detail">GL5528</span></td>
+                    <td class="text-center">4</td>
+                    <td class="text-right">0.80 €</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Sensor DHT22</strong><span class="spec-detail">Tempertura/Humidade</span></td>
+                    <td class="text-center">1</td>
+                    <td class="text-right">5.50 €</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Push Buttons</strong><span class="spec-detail">Interruptores Táteis</span></td>
+                    <td class="text-center">2</td>
+                    <td class="text-right">0.40 €</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Interruptor de Travamento</strong><span class="spec-detail">Botão ON/OFF</span></td>
+                    <td class="text-center">1</td>
+                    <td class="text-right">1.50 €</td>
+                  </tr>
+
+                  <tr class="category-row">
+                    <td colspan="3">3. Comunicação & Energia</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Wemos D1 Mini (ESP8266)</strong><span class="spec-detail">Gateway Wi-Fi/MQTT</span></td>
+                    <td class="text-center">1</td>
+                    <td class="text-right">5.50 €</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Módulo Bluetooth HC-05</strong><span class="spec-detail">BLE</span>
+                    </td>
+                    <td class="text-center">1</td>
+                    <td class="text-right">4.00 €</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Sensor INA219</strong><span class="spec-detail">Monitor Potência (I2C)</span></td>
+                    <td class="text-center">1</td>
+                    <td class="text-right">4.50 €</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Painel Solar PV</strong><span class="spec-detail">6V 0.25A</span></td>
+                    <td class="text-center">1</td>
+                    <td class="text-right">8.00 €</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Power Bank</strong><span class="spec-detail">Fonte Portátil 5V/2A USB</span></td>
+                    <td class="text-center">1</td>
+                    <td class="text-right">12.00 €</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Porta USB</strong><span class="spec-detail">USB Tipo-A Fêmea</span></td>
+                    <td class="text-center">1</td>
+                    <td class="text-right">0.90 €</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Cabo USB</strong><span class="spec-detail">Macho-Macho (Tipo A)</span></td>
+                    <td class="text-center">1</td>
+                    <td class="text-right">2.50 €</td>
+                  </tr>
+
+                  <tr class="category-row">
+                    <td colspan="3">4. Passivos, Conectores & Mecânica</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Estrutura Pan/Tilt</strong><span class="spec-detail">Impressão 3D (PLA)</span></td>
+                    <td class="text-center">1</td>
+                    <td class="text-right">30.00 €</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Breadboard</strong><span class="spec-detail">Matriz de Contactos (830 pts)</span></td>
+                    <td class="text-center">1</td>
+                    <td class="text-right">4.50 €</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Kit Resistências</strong><span class="spec-detail">10kΩ, 1kΩ, 220Ω, 330Ω (1/4W)</span>
+                    </td>
+                    <td class="text-center">9</td>
+                    <td class="text-right">0.50 €</td>
+                  </tr>
+                  <tr>
+                    <td><strong>LEDs</strong><span class="spec-detail">5mm (Vermelho, Verde, Amarelo)</span>
+                    </td>
+                    <td class="text-center">3</td>
+                    <td class="text-right">0.30 €</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Carga Resistiva (Dummy)</strong><span class="spec-detail">8x 47Ω</span></td>
+                    <td class="text-center">1</td>
+                    <td class="text-right">1.50 €</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Condensadores</strong><span class="spec-detail">100nF (x2) + 470µF Bulk</span></td>
+                    <td class="text-center">1</td>
+                    <td class="text-right">0.80 €</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Cabos Jumper</strong><span class="spec-detail">Dupont Macho-Macho/Fêmea</span></td>
+                    <td class="text-center">Kit</td>
+                    <td class="text-right">3.50 €</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Kit Fixação</strong><span class="spec-detail">Parafusos e Porcas M3</span></td>
+                    <td class="text-center">Kit</td>
+                    <td class="text-right">2.00 €</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Pés de Borracha</strong><span class="spec-detail">Adesivos Antiderrapantes</span></td>
+                    <td class="text-center">4</td>
+                    <td class="text-right">0.50 €</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="engineering-block mt-40">
+        <h3> Design da PCB (KiCad)</h3>
+        <div class="pcb-open-stage">
+          <div class="pcb-grid-bg"></div>
+          <model-viewer id="pcb-viewer" src="assets/pcb_model.compressed.glb" alt="Modelo 3D da PCB" auto-rotate
+            camera-controls disable-zoom disable-pan disable-tap shadow-intensity="1" shadow-softness="1" exposure="1"
+            environment-image="neutral" interaction-prompt="when-focused" camera-orbit="45deg 55deg 105%"
+            min-camera-orbit="auto auto 105%" max-camera-orbit="auto auto 105%" class="open-viewer">
+            <div slot="poster" class="placeholder-box">
+              <i class="fas fa-circle-notch fa-spin"></i>
+            </div>
+          </model-viewer>
+
+          <div class="pcb-widgets-row">
+            <div class="pcb-widget">
+              <div class="widget-icon"><i class="fas fa-ruler-combined"></i></div>
+              <div class="widget-info">
+                <span class="w-label">Dimensões</span>
+                <span class="w-value">112.5 x 86.5 mm</span>
+              </div>
+            </div>
+            <div class="pcb-widget">
+              <div class="widget-icon"><i class="fas fa-layer-group"></i></div>
+              <div class="widget-info">
+                <span class="w-label">Camadas</span>
+                <span class="w-value">2 Layers</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+
+    <section id="engineering-hub" class="section fade-in">
+      <div class="section-header">
+        <h2>Relatório Técnico de Firmware (Bare-Metal)</h2>
+        <div class="line"></div>
+      </div>
+
+      <div class="container">
+        <div class="docs-layout">
+          <aside class="docs-sidebar">
+            <nav class="docs-nav">
+              <button class="doc-nav-btn active" onclick="openDocTab('doc-timers')">
+                <i class="fas fa-clock"></i> 1. Timers & Sinais
+              </button>
+              <button class="doc-nav-btn" onclick="openDocTab('doc-isrs')">
+                <i class="fas fa-microchip"></i> 2. Interrupções
+              </button>
+              <button class="doc-nav-btn" onclick="openDocTab('doc-proto')">
+                <i class="fas fa-network-wired"></i> 3. Protocolos HW
+              </button>
+              <button class="doc-nav-btn" onclick="openDocTab('doc-buffer')">
+                <i class="fas fa-sync-alt"></i> 4. Ring Buffer
+              </button>
+              <button class="doc-nav-btn" onclick="openDocTab('doc-adc')">
+                <i class="fas fa-wave-square"></i> 5. ADC & Filtros
+              </button>
+              <button class="doc-nav-btn" onclick="openDocTab('doc-pid')">
+                <i class="fas fa-calculator"></i> 6. Algoritmo PID
+              </button>
+              <button class="doc-nav-btn" onclick="openDocTab('doc-arch')">
+                <i class="fas fa-project-diagram"></i> 7. Arquitetura
+              </button>
+
+              <button class="doc-nav-btn" onclick="openDocTab('doc-uart')">
+                <i class="fas fa-exchange-alt"></i> 8. Interface UART
+              </button>
+            </nav>
+          </aside>
+
+          <div class="docs-content">
+
+            <div id="doc-timers" class="doc-panel active">
+              <div class="doc-header">
+                <h3>1. Cronometragem e Geração de Sinais (Timers)</h3>
+                <p>A gestão de tempo é o alicerce de qualquer sistema de controlo. O ATmega328P dispõe de três
+                  temporizadores de hardware, todos utilizados neste projeto para funções específicas e não bloqueantes.
+                </p>
+              </div>
+
+              <div class="stack-layout">
+
+                <div class="card card-padding-20">
+                  <h4 class="text-accent">1.1. Timer 0 (8-bit): Base de Tempo </h4>
+                  <p>Configurado em modo CTC para gerar uma interrupção
+                    precisa a cada 1 ms. Esta interrupção incrementa um contador global
+                    (sistema_millis), dissociando a contagem de tempo do ciclo de instrução principal.</p>
+                  <ul class="tech-specs-list small-text mt-15">
+                    <li><strong>Modo:</strong> WGM01 = 1 (CTC)</li>
+                    <li><strong>Prescaler:</strong> 64 (CS01 | CS00)</li>
+                    <li><strong>Comparador (OCR0A):</strong> 249</li>
+                  </ul>
+                  <div class="formula-box-clean mt-15">
+                    $$f_{int} = \frac{f_{clk}}{N \cdot (1 + OCR0A)} = 1000 \text{ Hz}$$
+                  </div>
+                </div>
+
+                <div class="card card-padding-20">
+                  <h4 class="text-accent">1.2. Timer 1 (16-bit)</h4>
+                  <p>Para o controlo dos servomotores SG90, exigiu-se um sinal PWM de 50Hz com alta resolução.
+                    Utilizou-se o Modo 14 (Fast PWM), onde o registo ICR1 define o teto
+                    (TOP) da contagem.</p>
+                  <ul class="tech-specs-list small-text mt-15">
+                    <li><strong>Frequência Alvo:</strong> 50 Hz (Período T = 20ms)</li>
+                    <li><strong>Prescaler (N):</strong> 8</li>
+                  </ul>
+                  <div class="formula-box-clean mt-15">
+                    $$ICR1 = \frac{f_{clk}}{N \cdot f_{pwm}} - 1 = 39.999$$
+                  </div>
+                </div>
+
+                <div class="card card-padding-20">
+                  <h4 class="text-accent">1.3. Timer 2 (8-bit): Referência One-Wire</h4>
+                  <p>Este temporizador funciona como um cronómetro de alta velocidade para descodificar o protocolo do
+                    sensor DHT22. Não gera interrupções periódicas; em vez disso, o seu valor é lido diretamente para
+                    medir a duração dos pulsos de sinal.</p>
+
+                  <ul class="tech-specs-list small-text mt-15">
+                    <li><strong>Modo:</strong> Normal (Contagem Livre)</li>
+                    <li><strong>Prescaler:</strong> 64 (CS22)</li>
+                    <li><strong>Resolução Temporal:</strong> 4µs por tick</li>
+                  </ul>
+
+                  <div class="formula-box-clean mt-15">
+                    $$t_{tick} = \frac{1}{f_{clk} / N} = \frac{1}{16\text{MHz} / 64} = 4 \mu s$$
+                  </div>
+
+                </div>
+
+              </div>
+            </div>
+            <div id="doc-isrs" class="doc-panel">
+              <div class="doc-header">
+                <h3>2. Multitarefa via Interrupções (ISRs)</h3>
+                <p>O "segredo" para o sistema fazer inumeras tarefas simultaneamente sem bloquear. </p>
+              </div>
+
+              <div class="isr-grid">
+
+                <div class="isr-card type-time">
+                  <div class="isr-header">
+                    <div class="isr-icon-box">
+                      <i class="fas fa-clock"></i>
+                    </div>
+                    <span class="code-badge">TIMER0_COMPA_vect</span>
+                  </div>
+                  <h4 class="isr-title">Base de Tempo (Heartbeat)</h4>
+                  <p class="isr-desc">
+                    Dispara a cada 1ms exato. A sua única função é incrementar o contador global
+                    <code>sistema_millis</code>. É o relógio mestre que permite agendar todas as outras tarefas sem usar
+                    <code>delay()</code>.
+                  </p>
+                </div>
+
+                <div class="isr-card type-sensor">
+                  <div class="isr-header">
+                    <div class="isr-icon-box">
+                      <i class="fas fa-wave-square"></i>
+                    </div>
+                    <span class="code-badge">INT0_vect</span>
+                  </div>
+                  <h4 class="isr-title">Leitura do Sensor (DHT22)</h4>
+                  <p class="isr-desc">
+                    Acordada pela Falling Edge do sinal do sensor. Captura o valor instantâneo do Timer 2 para medir a
+                    largura do pulso e descodificar se o bit recebido é '0' ou '1'.
+                  </p>
+                </div>
+
+                <div class="isr-card type-rx">
+                  <div class="isr-header">
+                    <div class="isr-icon-box">
+                      <i class="fas fa-download"></i>
+                    </div>
+                    <span class="code-badge">USART_RX_vect</span>
+                  </div>
+                  <h4 class="isr-title">Receção de Comandos</h4>
+                  <p class="isr-desc">
+                    Dispara assim que chega um byte do ESP8266. Permite ao sistema reagir
+                    instantaneamente a comandos (ex:'M' para Manual), interrompendo qualquer cálculo.
+                  </p>
+                </div>
+
+                <div class="isr-card type-tx">
+                  <div class="isr-header">
+                    <div class="isr-icon-box">
+                      <i class="fas fa-upload"></i>
+                    </div>
+                    <span class="code-badge">USART_UDRE_vect</span>
+                  </div>
+                  <h4 class="isr-title">Transmissão em Background</h4>
+                  <p class="isr-desc">
+                    O "Carteiro Automático". Acorda apenas quando o hardware está livre para enviar mais um byte do Ring
+                    Buffer. Garante que o envio de textos longos não bloqueia o ATMEGA.
+                  </p>
+                </div>
+
+              </div>
+
+              <div class="warning-box">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                  <strong>Nota:</strong> Variáveis partilhadas entre ISRs e o código principal (ex:
+                  <code>estado_sistema</code>) devem ser declaradas como volatile e o seu acesso deve ser
+                  atómico (desligar interrupções brevemente durante a leitura) para evitar corrupção de dados.
+                </div>
+              </div>
+            </div>
+           <div id="doc-proto" class="doc-panel">
+          <div class="doc-header">
+            <h3>3. Protocolos de Hardware (Low-Level)</h3>
+            <p>Implementação "Bare-Metal" proprietária. Abandonámos as bibliotecas padrão (<code>Wire.h</code> e <code>DHT.h</code>) para obter controlo total sobre temporizações e, crucialmente, para implementar mecanismos de recuperação de erros que não existem no código nativo do Arduino.</p>
+          </div>
+
+          <div class="stack-layout">
+            
+            <div class="card card-padding-20" style="border-left: 5px solid #ea580c;">
+              
+              <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 20px;">
+                <div style="display: flex; gap: 15px; align-items: center;">
+                  <div class="conc-icon-bg" style="background: #fff7ed; color: #ea580c; width: 48px; height: 48px; font-size: 1.2rem;">
+                    <i class="fas fa-network-wired"></i>
+                  </div>
+                  <div>
+                    <h4 style="margin: 0; color: var(--primary); font-size: 1.1rem; font-weight: 700;">I2C</h4>
+                    <span class="small-text text-muted">Sensor INA219</span>
+                  </div>
+                </div>
+                <span class="code-badge">TWCR / TWDR</span>
+              </div>
+
+              <p class="small-text text-muted">
+                A implementação padrão bloqueia o CPU se o escravo não responder. A nossa versão inclui um contador decrescente de segurança em cada etapa (Start, Write, Read), impedindo o bloqueio do sistema em caso de falha de hardware.
+              </p>
+
+              <div class="split-view-gapped mt-15 align-items-center">
+            
+                 
+                 <div style="width: 100%;">
+                    <div class="formula-box-clean" style="font-size: 0.9rem; padding: 10px;">
+                      $$TWBR = \frac{F_{CPU}/F_{SCL} - 16}{2} = 72$$
+                    </div>
+                    <p class="text-center small-text text-muted mt-5">Configurado para <strong>100 kHz</strong> estáveis.</p>
+                 </div>
+              </div>
+            </div>
+
+            <div class="card card-padding-20" style="border-left: 5px solid #0284c7;">
+              
+              <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 20px;">
+                <div style="display: flex; gap: 15px; align-items: center;">
+                  <div class="conc-icon-bg" style="background: #f0f9ff; color: #0284c7; width: 48px; height: 48px; font-size: 1.2rem;">
+                    <i class="fas fa-bolt"></i>
+                  </div>
+                  <div>
+                    <h4 style="margin: 0; color: var(--primary); font-size: 1.1rem; font-weight: 700;">One-Wire</h4>
+                    <span class="small-text text-muted">Sensor DHT22 (Pino PD2)</span>
+                  </div>
+                </div>
+                <span class="code-badge">Timer 2 + INT0</span>
+              </div>
+
+              <p class="small-text text-muted">
+                A leitura do DHT22 exige 20ms de atenção total. Para não "congelar" os servos, dividimos o protocolo em duas fases distintas na máquina de estados, permitindo que o PID continue a correr durante a inicialização do sensor.
+              </p>
+
+              <div class="grid-2 mt-15" style="gap: 20px;">
+                <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                  <div style="display: flex; gap: 10px; margin-bottom: 5px;">
+                    <span class="tag" style="background: #e0f2fe; color: #0284c7;">Fase 1: Start (Loop)</span>
+                  </div>
+                  <p class="small-text" style="margin: 0;">
+                    O pulso de 2ms é gerido por gerir_maquina_estados_dht() usando polling não-bloqueante. O CPU fica livre para outras tarefas.
+                  </p>
+                </div>
+
+                <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                  <div style="display: flex; gap: 10px; margin-bottom: 5px;">
+                    <span class="tag" style="background: #dbeafe; color: #1e40af;">Fase 2: Dados (ISR)</span>
+                  </div>
+                  <p class="small-text" style="margin: 0;">
+                    A leitura dos 40 bits é feita na interrupção INT0. O Timer 2 mede a largura exata de cada pulso (>12 ticks = '1').
+                  </p>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+            <div id="doc-buffer" class="doc-panel">
+              <div class="doc-header">
+                <h3>4. Buffer Circular e Transmissão Não-Bloqueante</h3>
+                <p>Ponto crítico para a performance.</p>
+              </div>
+
+              <div class="grid-2">
+                <div class="card card-padding-20" style="border-left: 4px solid var(--danger);">
+                  <h4 class="text-danger"><i class="fas fa-exclamation-triangle"></i> O Problema do printf</h4>
+                  <p>A velocidade de transmissão é 9600 bits/segundo. Enviar um único byte demora cerca de <strong>1
+                      milissegundo</strong>.</p>
+                  <p>Se enviarmos uma string de 100 caracteres:</p>
+                  <div class="formula-box-clean text-danger">
+                    $$100 \text{ bytes} \times 1ms = 100ms$$
+                  </div>
+                  <p class="small-text mt-10">Durante estes 100ms, o processador estaria "congelado". Motores tremeriam
+                    e sensores falhariam.</p>
+                </div>
+
+                <div class="card card-padding-20" style="border-left: 4px solid var(--success);">
+                  <h4 class="text-success"><i class="fas fa-check-circle"></i> A Solução: Ring Buffer</h4>
+                  <p>Implementou-se uma fila de espera (Ring Buffer) de 128 bytes.</p>
+                  <ul class="tech-step-list small-text mt-15">
+                    <li><strong>Loop Principal (Produtor):</strong> "Atira" os dados para o buffer instantaneamente (RAM
+                      é rápida).</li>
+                    <li><strong>Interrupção (Consumidor):</strong> A ISR pega num byte do buffer, envia-o, e retorna o
+                      controlo.</li>
+                  </ul>
+                  <p class="mt-15" style="font-weight: bold; color: var(--accent);">
+                    Resultado: O tempo de bloqueio cai de 100ms para alguns microssegundos.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div id="doc-adc" class="doc-panel">
+              <div class="doc-header">
+                <h3>5. Aquisição de Sinal (ADC) e Filtragem</h3>
+              </div>
+
+              <div class="card card-padding-20 mb-30">
+                <h4 class="text-accent">Multiplexagem Assíncrona</h4>
+                <p>O ATmega328P possui apenas um conversor ADC sucessivo. A leitura síncrona introduziria atrasos.</p>
+                <p class="mt-10 small-text">
+                  Estratégia: O sistema inicia uma conversão (bit ADSC) num canal, executa
+                  outras tarefas, e na próxima iteração do loop verifica se a conversão terminou. Só então lê o
+                  resultado e comuta o registo ADMUX para o próximo sensor (LDR).
+                </p>
+              </div>
+
+              <div class="card card-padding-20">
+                <h4 class="text-accent">Filtragem Digital (EMA)</h4>
+                <div class="split-view-gapped align-items-center">
+                  <div>
+                    <p>Para mitigar o ruído térmico nos sensores LDR, aplicou-se um Filtro de Média Móvel Exponencial:</p>
+                  </div>
+                  <div class="display-flex-center flex-column">
+                    <div class="formula-box-clean">
+                      $$Y[n] = (1 - \alpha) \cdot Y[n-1] + \alpha \cdot X[n]$$
+                    </div>
+                    <p class="text-center text-muted small-text mt-10"><em>Onde alpha = 0.08 (Fator de Suavização)</em></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="doc-pid" class="doc-panel">
+              <div class="doc-header">
+                <h3>6. Algoritmos de Controlo e Estabilidade</h3>
+                <p>Sistema híbrido que combina PID com heurísticas não-lineares.</p>
+              </div>
+
+              <div class="card card-padding-20 mb-30">
+                <h4 class="text-accent">6.1. Controlador PID em Tempo Discreto</h4>
+                <p>A implementação do PID segue a equação de diferenças:</p>
+                <div class="formula-box-clean mt-15 mb-15" style="font-size: 1.1rem;">
+                  $$u[n] = K_p \cdot e[n] + K_i \sum e[k] \Delta t + K_d \frac{e[n] - e[n-1]}{\Delta t}$$
+                </div>
+                <ul class="tech-specs-list small-text">
+                  <li><strong>Proporcional (K_p):</strong> Força motriz principal proporcional ao desvio.</li>
+                  <li><strong>Integral (K_i):</strong> Corrige erro estacionário, com Clamping Anti-Windup.</li>
+                  <li><strong>Derivativo (K_d):</strong> "Amortecedor" eletrónico para evitar Overshoot.</li>
+                </ul>
+              </div>
+
+              <div class="card card-padding-20">
+                <h4 class="text-accent">6.2. Histerese Dinâmica (Anti-Jitter)</h4>
+                <p>Implementou-se uma Zona Morta Variável baseada na irradiância total para evitar oscilações.</p>
+                <div class="table-wrapper mt-15">
+                  <table class="modern-table">
+                    <thead>
+                      <tr>
+                        <th>Condição</th>
+                        <th>Tolerância (Zona Morta)</th>
+                        <th>Comportamento</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><strong>Nublado</strong> (< 750 lux)</td>
+                        <td><span class="tag tag-green">Estreita (±40)</span></td>
+                        <td>Alta sensibilidade. Procura luz difusa.</td>
+                      </tr>
+                      <tr>
+                        <td><strong>Sol Intenso</strong> (> 750 lux)</td>
+                        <td><span class="tag tag-orange">Larga (±150)</span></td>
+                        <td>Baixa sensibilidade. Prioriza a estabilidade.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div id="doc-arch" class="doc-panel">
+              <div class="doc-header">
+                <h3>7. Arquitetura de Estados (FSM)</h3>
+              </div>
+              <div class="split-view-gapped">
+                <div class="card card-padding-20">
+                  <h4 class="text-accent">Máquina de Estados Finita</h4>
+                  <ul class="tech-specs-list mt-15">
+                    <li><strong>PAUSE:</strong> Motores desligados.</li>
+                    <li><strong>AUTO:</strong> PID ativo com leitura de sensores.</li>
+                    <li><strong>MANUAL:</strong> Controlo via MQTT.</li>
+                    <li><strong>NIGHT:</strong> Estacionamento seguro (45º V / 5º H).</li>
+                  </ul>
+                </div>
+                <div class="card card-padding-20">
+                  <h4 class="text-accent">Segurança (WDT)</h4>
+                  <p class="mt-10"><strong>Watchdog Timer:</strong> A macro WDT_RESET() deve ser executada
+                    a cada ciclo.</p>
+                  <p class="small-text mt-10">Se o processador bloquear por mais de 2 segundos, o sistema reinicia
+                    automaticamente.</p>
+                </div>
+              </div>
+            </div>
+
+            <div id="doc-uart" class="doc-panel">
+              <div class="doc-header">
+                <h3>8. Interface Física (UART)</h3>
+                <p>Interligação ATmega328P <-> ESP8266 via serial assíncrona.</p>
+              </div>
+
+              <div class="split-view-gapped">
+                <div class="card card-padding-20">
+                  <h4 class="text-accent"><i class="fas fa-exchange-alt"></i> Topologia Cross-Over</h4>
+                  <p>Comunicação Full-Duplex.</p>
+                  <ul class="tech-specs-list mt-15 small-text">
+                    <li><strong>TX (Transmissão):</strong> Pino PD1 do ATmega conecta ao RX do ESP8266.</li>
+                    <li><strong>RX (Receção):</strong> Pino PD0 do ATmega conecta ao TX do ESP8266.</li>
+                  </ul>
+                </div>
+
+                <div class="card card-padding-20">
+                  <h4 class="text-accent"><i class="fas fa-bolt"></i> Level Shifting</h4>
+                  <p>Adaptação de 5V para 3.3V (Divisor de Tensão) para proteger o ESP.</p>
+                  <div class="formula-box-clean mt-15">
+                    $$V_{RX} = 5V \cdot \frac{2k\Omega}{1k\Omega + 2k\Omega} \approx 3.33V$$
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section id="engineering" class="section fade-in">
+      <div class="section-header">
+        <h2>Lógica e Controlo (Fluxogramas)</h2>
+        <div class="line"></div>
+      </div>
+
+      <div class="container">
+        <div class="diagrams-tabs-wrapper">
+
+          <div id="dynamic-nav" class="diagram-nav">
+            <span style="padding: 20px; color: #64748b;">A carregar fluxogramas...</span>
+          </div>
+
+          <div id="diagram-viewport" class="diagram-viewport">
+
+            <div class="diagram-controls">
+              <button class="zoom-btn" onclick="DiagramZoom.zoom(-0.2)" title="Diminuir"><i
+                  class="fas fa-minus"></i></button>
+              <button class="zoom-btn" onclick="DiagramZoom.reset()" title="Enquadrar"><i
+                  class="fas fa-compress"></i></button>
+              <button class="zoom-btn" onclick="DiagramZoom.zoom(0.2)" title="Aumentar"><i
+                  class="fas fa-plus"></i></button>
+            </div>
+
+            <div id="dynamic-diagrams-container">
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="mqtt-control" class="section fade-in">
+      <div class="section-header">
+        <h2>Controlo em Tempo Real (MQTT)</h2>
+        <div class="line"></div>
+      </div>
+
+      <div class="dashboard-container">
+        <div class="dashboard-top-bar">
+          <div class="status-group">
+            <div class="nav-status-pill" id="broker-pill">
+              <span class="status-dot-small" id="broker-dot"></span>
+              <span class="status-label">Broker MQTT</span>
+            </div>
+
+            <div class="nav-status-pill" id="device-pill">
+              <span class="status-dot-small" id="device-dot"></span>
+              <span class="status-label">Dispositivo</span>
+            </div>
+          </div>
+
+          <div id="system-paused-alert" class="paused-badge hidden">
+            <i class="fas fa-pause-circle"></i> SISTEMA EM PAUSA
+          </div>
+          <div id="night-mode-alert" class="night-badge hidden">
+            <i class="fas fa-moon"></i> MODO NOITE ATIVO
+          </div>
+
+          <div class="last-update">
+            <i class="fas fa-satellite-dish"></i> Tópico: solar_7016
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="stack-layout">
+            <div class="mqtt-custom-grid">
+
+              <div class="kpi-card temp-card">
+                <div class="kpi-icon"><i class="fas fa-thermometer-half"></i></div>
+                <div class="kpi-data">
+                  <span class="kpi-label">Temperatura</span>
+                  <span class="kpi-value" id="mqtt-temp">-- °C</span>
+                </div>
+              </div>
+
+              <div class="kpi-card hum-card">
+                <div class="kpi-icon"><i class="fas fa-tint"></i></div>
+                <div class="kpi-data">
+                  <span class="kpi-label">Humidade</span>
+                  <span class="kpi-value" id="mqtt-hum">-- %</span>
+                </div>
+              </div>
+
+              <div class="kpi-card volt-card">
+                <div class="kpi-icon"><i class="fas fa-bolt"></i></div>
+                <div class="kpi-data">
+                  <span class="kpi-label">Tensão</span>
+                  <span class="kpi-value" id="mqtt-sol-v">-- mV</span>
+                </div>
+              </div>
+
+              <div class="kpi-card curr-card">
+                <div class="kpi-icon"><i class="fas fa-wave-square"></i></div>
+                <div class="kpi-data">
+                  <span class="kpi-label">Corrente</span>
+                  <span class="kpi-value" id="mqtt-sol-i">-- mA</span>
+                </div>
+              </div>
+
+              <div class="kpi-card power-card">
+                <div class="kpi-icon"><i class="fas fa-plug"></i></div>
+                <div class="kpi-data">
+                  <span class="kpi-label">Potência Instantânea</span>
+                  <span class="kpi-value" id="mqtt-sol-p">-- mW</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card card-padding-20">
+              <div class="card-header-tech card-header-transparent">
+                <h3><i class="fas fa-sun"></i> Sensores de Luz</h3>
+              </div>
+              <div class="ldr-modern-grid">
+                <div class="ldr-item">
+                  <span class="ldr-label-main">Sup. Esq (SE)</span>
+                  <div class="ldr-split">
+                    <div class="ldr-sub">
+                      <small>Pré calibração</small>
+                      <strong id="mqtt-raw-se" class="text-muted">0</strong>
+                    </div>
+                    <div class="vr"></div>
+                    <div class="ldr-sub">
+                      <small>Calibrado</small>
+                      <strong id="mqtt-cal-se" class="text-accent">0</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="ldr-item">
+                  <span class="ldr-label-main">Sup. Dir (SD)</span>
+                  <div class="ldr-split">
+                    <div class="ldr-sub">
+                      <small>Pré calibração</small>
+                      <strong id="mqtt-raw-sd" class="text-muted">0</strong>
+                    </div>
+                    <div class="vr"></div>
+                    <div class="ldr-sub">
+                      <small>Calibrado</small>
+                      <strong id="mqtt-cal-sd" class="text-accent">0</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="ldr-item">
+                  <span class="ldr-label-main">Inf. Esq (IE)</span>
+                  <div class="ldr-split">
+                    <div class="ldr-sub">
+                      <small>Pré calibração</small>
+                      <strong id="mqtt-raw-ie" class="text-muted">0</strong>
+                    </div>
+                    <div class="vr"></div>
+                    <div class="ldr-sub">
+                      <small>Calibrado</small>
+                      <strong id="mqtt-cal-ie" class="text-accent">0</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="ldr-item">
+                  <span class="ldr-label-main">Inf. Dir (ID)</span>
+                  <div class="ldr-split">
+                    <div class="ldr-sub">
+                      <small>Pré calibração</small>
+                      <strong id="mqtt-raw-id" class="text-muted">0</strong>
+                    </div>
+                    <div class="vr"></div>
+                    <div class="ldr-sub">
+                      <small>Calibrado</small>
+                      <strong id="mqtt-cal-id" class="text-accent">0</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="stack-layout">
+            <div class="card card-padding-20">
+              <div class="servos-info">
+                <div class="servo-stat">
+                  <span class="label">Horizontal</span>
+                  <span class="value gradient-text" id="mqtt-angH">--°</span>
+                </div>
+                <div class="divider-vert"></div>
+                <div class="servo-stat">
+                  <span class="label">Vertical</span>
+                  <span class="value gradient-text" id="mqtt-angV">--°</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card control-panel-card">
+              <div class="mode-selector" id="mode-selector-container">
+                <button class="btn btn-outline active" id="btn-mode-auto" onclick="MqttApp.setMode('A')">
+                  <i class="fas fa-robot"></i> AUTO
+                </button>
+                <button class="btn btn-outline" id="btn-mode-manual" onclick="MqttApp.setMode('M')">
+                  <i class="fas fa-gamepad"></i> MANUAL
+                </button>
+              </div>
+
+              <div class="d-pad-wrapper hidden" id="dpad-container">
+                <div class="d-pad-grid">
+                  <div></div>
+                  <button class="d-pad-btn" onclick="MqttApp.move('C')"><i class="fas fa-chevron-up"></i></button>
+                  <div></div>
+
+                  <button class="d-pad-btn" onclick="MqttApp.move('E')"><i class="fas fa-chevron-left"></i></button>
+                  <div class="d-pad-center"><i class="fas fa-arrows-alt"></i></div>
+                  <button class="d-pad-btn" onclick="MqttApp.move('D')"><i class="fas fa-chevron-right"></i></button>
+
+                  <div></div>
+                  <button class="d-pad-btn" onclick="MqttApp.move('B')"><i class="fas fa-chevron-down"></i></button>
+                  <div></div>
+                </div>
+              </div>
+              <div id="dpad-auto-view" class="auto-status-placeholder">
+                <div class="sun-tracking-animation">
+                  <i class="fas fa-sun"></i>
+                  <div class="tracking-waves"></div>
+                </div>
+                <span class="status-msg">Controlo Automático Ativo</span>
+                <p class="status-submsg">O PID está a ajustar os eixos com base nos LDRs</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section id="thingspeak" class="section fade-in">
+      <div class="section-header">
+        <h2>Resultados Experimentais (ThingSpeak)</h2>
+        <div class="line"></div>
+      </div>
+      <div class="dashboard-container">
+        <div class="dashboard-top-bar">
+          <div class="status-indicator-wrapper">
+            <div class="nav-status-pill status-pill-bg" id="dashboard-status-pill">
+              <span class="status-dot-small" id="ts-status-dot"></span>
+              <span id="ts-status-text">A conectar...</span>
+            </div>
+          </div>
+
+          <div class="data-feedback-wrapper">
+            <span id="chart-feedback-text" class="data-feedback-text">A aguardar dados...</span>
+          </div>
+
+          <div class="last-update">
+            <i class="far fa-clock"></i> Última leitura:
+            <span id="ts-last-update">--</span>
+          </div>
+        </div>
+
+        <div class="ts-custom-flex">
+
+          <div class="kpi-card temp-card">
+            <div class="kpi-icon"><i class="fas fa-thermometer-half"></i></div>
+            <div class="kpi-data">
+              <span class="kpi-label">Temperatura</span>
+              <span class="kpi-value" id="ts-temp">-- °C</span>
+            </div>
+          </div>
+
+          <div class="kpi-card hum-card">
+            <div class="kpi-icon"><i class="fas fa-tint"></i></div>
+            <div class="kpi-data">
+              <span class="kpi-label">Humidade</span>
+              <span class="kpi-value" id="ts-hum">-- %</span>
+            </div>
+          </div>
+
+          <div class="kpi-card volt-card">
+            <div class="kpi-icon"><i class="fas fa-bolt"></i></div>
+            <div class="kpi-data">
+              <span class="kpi-label">Tensão</span>
+              <span class="kpi-value" id="ts-voltage">-- mV</span>
+            </div>
+          </div>
+
+          <div class="kpi-card curr-card">
+            <div class="kpi-icon"><i class="fas fa-wave-square"></i></div>
+            <div class="kpi-data">
+              <span class="kpi-label">Corrente</span>
+              <span class="kpi-value" id="ts-current">-- mA</span>
+            </div>
+          </div>
+
+          <div class="kpi-card power-card">
+            <div class="kpi-icon"><i class="fas fa-plug"></i></div>
+            <div class="kpi-data">
+              <span class="kpi-label">Potência</span>
+              <span class="kpi-value" id="ts-power">-- mW</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="charts-panel">
+          <div class="panel-header">
+            <h4 class="panel-title">
+              <i class="fas fa-chart-area"></i> Análise Gráfica
+            </h4>
+          </div>
+
+          <div class="table-toolbar toolbar-styled">
+            <div class="toolbar-filters filters-styled">
+              <div class="input-group">
+                <label>De:</label>
+                <div class="input-wrapper-icon">
+                  <input type="text" id="chart-start" class="modern-input" placeholder="Selecionar data..." />
+                </div>
+              </div>
+              <div class="input-group">
+                <label>Até:</label>
+                <div class="input-wrapper-icon">
+                  <input type="text" id="chart-end" class="modern-input" placeholder="Selecionar data..." />
+                </div>
+              </div>
+
+              <button id="btn-chart-filter" class="tool-btn primary">
+                <i class="fas fa-search"></i> Filtrar
+              </button>
+              <button id="btn-chart-all" class="tool-btn secondary" title="Carregar todo o histórico disponível">
+                <i class="fas fa-database"></i> Ver Todos
+              </button>
+            </div>
+          </div>
+
+          <div class="charts-grid">
+            <div class="chart-wrapper chart-container-height">
+              <canvas id="chart-temp"></canvas>
+            </div>
+            <div class="chart-wrapper chart-container-height">
+              <canvas id="chart-hum"></canvas>
+            </div>
+
+            <div class="chart-wrapper chart-container-height">
+              <canvas id="chart-voltage"></canvas>
+            </div>
+            <div class="chart-wrapper chart-container-height">
+              <canvas id="chart-current"></canvas>
+            </div>
+            <div class="chart-wrapper chart-container-height" style="grid-column: 1 / -1;">
+              <canvas id="chart-power"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="data-log-section">
+          <details class="modern-accordion">
+            <summary class="accordion-header">
+              <div class="summary-content">
+                <div class="summary-icon-box"><i class="fas fa-database"></i></div>
+                <div class="summary-text">
+                  <span class="summary-title">Histórico de Dados</span>
+                  <span class="summary-subtitle">Consultar, Filtrar e Exportar Registos</span>
+                </div>
+              </div>
+              <span class="accordion-chevron"><i class="fas fa-chevron-down"></i></span>
+            </summary>
+
+            <div class="accordion-body">
+              <div class="control-panel-wrapper">
+
+                <div class="filter-group">
+                  <span class="filter-label"><i class="fas fa-filter"></i> Filtros de Pesquisa</span>
+                  <div class="filter-grid">
+                    <div class="input-wrapper-icon">
+                      <i class="far fa-calendar-alt input-icon"></i>
+                      <input type="date" id="hist-start" class="modern-input pl-40" placeholder="Início" />
+                    </div>
+
+                    <div class="input-wrapper-icon">
+                      <i class="far fa-calendar-alt input-icon"></i>
+                      <input type="date" id="hist-end" class="modern-input pl-40" placeholder="Fim" />
+                    </div>
+
+                    <div class="input-wrapper-icon">
+                      <i class="fas fa-sort-amount-down input-icon"></i>
+                      <select id="hist-order" class="modern-select pl-40">
+                        <option value="desc">Mais Recentes</option>
+                        <option value="asc">Mais Antigos</option>
+                      </select>
+                    </div>
+
+                    <button id="btn-load-history" class="tool-btn primary btn-full-height">
+                      <i class="fas fa-search"></i> Carregar
+                    </button>
+                  </div>
+                </div>
+
+                <div class="panel-divider"></div>
+
+                <div class="actions-group">
+                  <span class="filter-label"><i class="fas fa-cogs"></i> Gestão</span>
+                  <div class="actions-grid">
+                    <button id="btn-hist-all" class="tool-btn secondary" title="Carregar todo o histórico">
+                      <i class="fas fa-database"></i> Ver Tudo
+                    </button>
+                    <button id="btn-download-csv" class="tool-btn secondary" title="Baixar CSV">
+                      <i class="fas fa-file-csv"></i> CSV
+                    </button>
+                    <button id="btn-delete-all" class="tool-btn danger-outline" title="Apagar Tudo">
+                      <i class="fas fa-trash-alt"></i> Limpar
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="table-container-scroll mt-20">
+                <table class="modern-table refined-table" id="history-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th><i class="far fa-clock"></i> Data / Hora</th>
+                      <th>Temp</th>
+                      <th>Hum</th>
+                      <th>Tensão</th>
+                      <th>Corrente</th>
+                      <th>Potência</th>
+                    </tr>
+                  </thead>
+                  <tbody id="history-table-body">
+                    <tr>
+                      <td colspan="8" class="empty-state">
+                        <div class="empty-content">
+                          <div class="empty-icon-bg"><i class="fas fa-search"></i></div>
+                          <p>Selecione um intervalo e clique em <strong>Carregar</strong></p>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="pagination-controls pagination-styled mt-20">
+                <button id="btn-prev-page" class="tool-btn secondary small" disabled>
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <span id="page-indicator" class="page-indicator-badge">Página 1</span>
+                <button id="btn-next-page" class="tool-btn secondary small" disabled>
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div id="toast-container" class="toast-container"></div>
+    </section>
+
+    <section id="media-results" class="section fade-in">
+      <div class="section-header">
+        <h2>Galeria de Resultados</h2>
+        <div class="line"></div>
+      </div>
+      <div class="engineering-block">
+        <div class="media-grid">
+          <div class="video-wrapper card">
+            <iframe 
+              width="100%" 
+              height="100%" 
+              src="https://www.youtube.com/embed/0YOgMDujPYQ" 
+              title="Demonstração Solar Tracker" 
+              frameborder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+              allowfullscreen
+              style="min-height: 350px; border-radius: 8px;">
+            </iframe>
+          </div>
+
+          <div class="photo-gallery">
+            <div class="photo-card" style="cursor: pointer;" onclick="document.getElementById('btn-exp-f1').click()">
+              <img id="foto1-img" src="assets/foto1.jpg" alt="Frontal" class="crisp-rendering"
+                style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+              <button id="btn-exp-f1" class="visual-hide">Expandir</button>
+            </div>
+
+            <div class="photo-card" style="cursor: pointer;" onclick="document.getElementById('btn-exp-f2').click()">
+              <img id="foto2-img" src="assets/foto2.jpg" alt="Traseira" class="crisp-rendering"
+                style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+              <button id="btn-exp-f2" class="visual-hide">Expandir</button>
+            </div>
+
+            <div class="photo-card" style="cursor: pointer;" onclick="document.getElementById('btn-exp-f3').click()">
+              <img id="foto3-img" src="assets/foto3.jpg" alt="Breadboard" class="crisp-rendering"
+                style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+              <button id="btn-exp-f3" class="visual-hide">Expandir</button>
+            </div>
+
+            <div class="photo-card" style="cursor: pointer;" onclick="document.getElementById('btn-exp-g1').click()">
+              <img id="gif1-img" src="assets/gif1.gif" alt="GIF" class="crisp-rendering"
+                style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+              <button id="btn-exp-g1" class="visual-hide">Expandir</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="code-analysis" class="section fade-in">
+      <div class="section-header">
+        <h2>Código Fonte & Software</h2>
+        <div class="line"></div>
+      </div>
+
+      <div class="vscode-window fade-in">
+        <div class="vscode-title-bar">
+          <div class="window-controls">
+            <span class="dot close"></span>
+            <span class="dot minimize"></span>
+            <span class="dot maximize"></span>
+          </div>
+          <div class="window-title">SolarTracker - Visual Studio Code</div>
+        </div>
+
+        <div class="vscode-body">
+          <div class="vscode-sidebar">
+            <div class="sidebar-header">EXPLORER</div>
+            <div class="sidebar-section">
+              <div class="section-title"><i class="fas fa-chevron-down"></i> PROJETO-SOLAR</div>
+              <div class="file-tree">
+                <div class="file-item active" data-file="main.c" data-lang="c">
+                  <span class="c-icon-custom">C</span> main.c
+                </div>
+
+                <div class="file-item" data-file="esp8266.ino" data-lang="cpp">
+                  <i class="fas fa-infinity icon-ino-color"></i> esp8266.ino
+                </div>
+
+                <div class="file-item" data-file="app_ponte.py" data-lang="python">
+                  <i class="fab fa-python py-icon"></i> app_ponte.py
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="vscode-editor">
+            <div class="editor-tabs">
+              <div class="tab active" data-file="main.c">
+                <span class="c-icon-custom">C</span> main.c
+              </div>
+
+              <div class="tab" data-file="esp8266.ino">
+                <i class="fas fa-infinity icon-ino-color mr-5"></i> esp8266.ino
+              </div>
+
+              <div class="tab" data-file="app_ponte.py">
+                <i class="fab fa-python py-icon"></i> app_ponte.py
+              </div>
+            </div>
+
+            <div class="editor-toolbar">
+              <div class="breadcrumbs">src > <span id="current-folder">firmware</span> > <span
+                  id="current-filename">main.c</span></div>
+
+              <div class="actions">
+                <a href="app_ponte.zip" download="SolarTracker_App.zip" id="btn-download-exe"
+                  class="vscode-btn-primary btn-hidden">
+                  <i class="fas fa-file-archive"></i> Download App (.zip)
+                </a>
+
+                <button id="btn-copy-curr" class="vscode-icon-btn" title="Copiar Código">
+                  <i class="far fa-copy"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="code-container">
+              <pre><code id="vscode-code-content" class="language-c">A carregar...</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="vscode-status-bar">
+          <div class="left-items">
+            <div class="status-item"><i class="fas fa-code-branch"></i> master</div>
+            <div class="status-item"><i class="far fa-check-circle"></i> Ready</div>
+          </div>
+          <div class="right-items">
+            <div class="status-item" id="status-lang">C</div>
+            <div class="status-item">UTF-8</div>
+            <div class="status-item"><i class="fas fa-bell"></i></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="conclusions" class="section fade-in">
+      <div class="section-header">
+        <h2>Conclusões & Próximos Passos</h2>
+        <div class="line"></div>
+      </div>
+
+      <div class="conclusions-container">
+
+        <div class="conc-col results-col">
+          <div class="conc-header">
+            <div class="conc-icon-bg success">
+              <i class="fas fa-clipboard-check"></i>
+            </div>
+            <h3>Objetivos Alcançados</h3>
+          </div>
+
+          <div class="results-wrapper">
+            <div class="result-item result-success-bg">
+              <div class="result-status">
+                <i class="fas fa-check"></i>
+              </div>
+              <div class="result-content">
+                <h4 class="text-dark-green">Evolução IoT (V1 &rarr; V2)</h4>
+                <p>Transição bem-sucedida da comunicação local (Bluetooth HC-05) para Global (Wi-Fi/MQTT). O sistema
+                  agora opera autonomamente sem depender de um PC Gateway próximo.
+                </p>
+              </div>
+            </div>
+
+            <div class="result-item">
+              <div class="result-status">
+                <i class="fas fa-check"></i>
+              </div>
+              <div class="result-content">
+                <h4>Arquitetura Distribuída</h4>
+                <p>Implementação robusta de processamento paralelo: o ATmega328P garante o
+                  <em>timing</em> crítico dos servos, enquanto o ESP8266 gere a latência de rede e o parsing de dados
+                  JSON.
+                </p>
+              </div>
+            </div>
+
+            <div class="result-item">
+              <div class="result-status">
+                <i class="fas fa-check"></i>
+              </div>
+              <div class="result-content">
+                <h4>Estabilidade Híbrida</h4>
+                <p>O algoritmo de "Zona Morta Dinâmica" provou ser eficaz, eliminando o <em>jitter</em> dos motores sob
+                  luz solar intensa (tolerância aumentada para 150) sem perder sensibilidade em dias nublados.</p>
+              </div>
+            </div>
+
+            <div class="result-item">
+              <div class="result-status">
+                <i class="fas fa-check"></i>
+              </div>
+              <div class="result-content">
+                <h4>Eficiência Energética</h4>
+                <p>Integração de modos de suspensão via interrupção externa e desligamento automático do sinal PWM
+                  (Detach) após 200ms de inatividade.</p>
+              </div>
+            </div>
+
+            <div class="result-item">
+              <div class="result-status">
+                <i class="fas fa-check"></i>
+              </div>
+              <div class="result-content">
+                <h4>Monitorização Energética (INA219)</h4>
+                <p>Leitura em tempo real de Tensão, Corrente e Potência solar via sensor I2C. Integração completa com o
+                  Dashboard para análise de eficiência do painel.</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="conc-col roadmap-col">
+          <div class="conc-header">
+            <div class="conc-icon-bg warning">
+              <i class="fas fa-hard-hat"></i>
+            </div>
+            <h3>Trabalho Futuro</h3>
+          </div>
+
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-marker"></div>
+              <div class="timeline-content">
+                <h4>Proteção Eólica (Anemómetro)</h4>
+                <p>Integração de sensor de vento para ativar o "Modo de Segurança" (Painel na horizontal/0º)
+                  automaticamente em caso de tempestade para evitar danos estruturais.</p>
+              </div>
+            </div>
+
+            <div class="timeline-item">
+              <div class="timeline-marker"></div>
+              <div class="timeline-content">
+                <h4>Gestão Económica (MIBEL)</h4>
+                <p>Ligação à API do Mercado Ibérico (OMIE) para obter o preço da eletricidade em tempo real. O sistema
+                  passará a exibir um contador de "Euros Poupados" cruzando a produção solar com o custo atual do kWh.
+                </p>
+              </div>
+            </div>
+
+            <div class="timeline-item">
+              <div class="timeline-marker"></div>
+              <div class="timeline-content">
+                <h4>Cronometragem Offline</h4>
+                <p>Integração de um módulo DS3231 (I2C) para garantir a hora correta e a integridade do datalogging
+                  mesmo em caso de falha de Wi-Fi, eliminando a dependência exclusiva de servidores NTP.</p>
+              </div>
+            </div>
+
+            <div class="timeline-item">
+              <div class="timeline-marker"></div>
+              <div class="timeline-content">
+                <h4>Interface Local (HMI OLED)</h4>
+                <p>Instalação de display OLED 0.96" para diagnóstico imediato no terreno (IP,
+                  Tensão, Erros, Ângulos) sem necessidade de aceder ao Dashboard Web.</p>
+              </div>
+            </div>
+
+            <div class="timeline-item">
+              <div class="timeline-marker"></div>
+              <div class="timeline-content">
+                <h4>Rastreio Astronómico (GPS)</h4>
+                <p>Algoritmo híbrido que usa coordenadas GPS para calcular a posição solar teórica (Azimute/Elevação),
+                  garantindo orientação precisa mesmo em dias nublados ou com sensores obstruídos.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="references" class="section fade-in">
+      <div class="section-header">
+        <h2>Referências Bibliográficas</h2>
+        <div class="line"></div>
+      </div>
+
+      <div class="references-container">
+
+        <div class="ref-group">
+          <h4><i class="fas fa-microchip"></i> Hardware & Datasheets</h4>
+          <div class="ref-list">
+            <a href="https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf"
+              target="_blank" class="ref-item">
+              <span class="ref-tag hardware">MCU Core</span>
+              <div class="ref-info">
+                <strong>ATmega328P Datasheet</strong>
+                <small>Microchip Technology Inc. (Cérebro PID)</small>
+              </div>
+              <i class="fas fa-external-link-alt"></i>
+            </a>
+
+            <a href="https://www.ti.com/lit/ds/symlink/ina219.pdf" target="_blank" class="ref-item border-left-accent">
+              <span class="ref-tag sensor" style="background:#fef3c7; color:#d97706;">Power I2C</span>
+              <div class="ref-info">
+                <strong>INA219 Datasheet</strong>
+                <small>Texas Instruments (Monitor Tensão/Corrente)</small>
+              </div>
+              <i class="fas fa-bolt"></i>
+            </a>
+
+            <a href="https://www.wemos.cc/en/latest/d1/d1_mini.html" target="_blank" class="ref-item">
+              <span class="ref-tag tag-wifi">Wi-Fi SoC</span>
+              <div class="ref-info">
+                <strong>ESP8266 (Wemos D1 Mini)</strong>
+                <small>Espressif Systems (Gateway IoT)</small>
+              </div>
+              <i class="fas fa-external-link-alt"></i>
+            </a>
+
+            <a href="https://components101.com/wireless/hc-05-bluetooth-module" target="_blank" class="ref-item">
+              <span class="ref-tag tag-wifi" style="background:#e0f2fe; color:#0369a1;">Bluetooth</span>
+              <div class="ref-info">
+                <strong>HC-05 Module</strong>
+                <small>Serial Port Profile (SPP) Bluetooth</small>
+              </div>
+              <i class="fab fa-bluetooth-b"></i>
+            </a>
+
+            <a href="https://www.sparkfun.com/datasheets/Sensors/Temperature/DHT22.pdf" target="_blank"
+              class="ref-item">
+              <span class="ref-tag sensor">Sensor</span>
+              <div class="ref-info">
+                <strong>DHT22 (AM2302)</strong>
+                <small>Aosong Electronics (Temp & Humidade)</small>
+              </div>
+              <i class="fas fa-external-link-alt"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="ref-group">
+          <h4><i class="fas fa-code"></i> Software & Protocolos</h4>
+          <div class="ref-list">
+            <a href="https://pubsubclient.knolleary.net/" target="_blank" class="ref-item border-left-accent">
+              <span class="ref-tag software">IoT Lib</span>
+              <div class="ref-info">
+                <strong>PubSubClient (MQTT)</strong>
+                <small>Nick O'Leary (Protocolo de Telemetria)</small>
+              </div>
+              <i class="fas fa-external-link-alt"></i>
+            </a>
+
+            <a href="https://www.nongnu.org/avr-libc/user-manual/" target="_blank" class="ref-item">
+              <span class="ref-tag software">Firmware</span>
+              <div class="ref-info">
+                <strong>AVR Libc Documentation</strong>
+                <small>Standard C Library for AVR</small>
+              </div>
+              <i class="fas fa-external-link-alt"></i>
+            </a>
+
+            <a href="https://www.chartjs.org/" target="_blank" class="ref-item">
+              <span class="ref-tag web">Dashboard</span>
+              <div class="ref-info">
+                <strong>Chart.js & Paho MQTT JS</strong>
+                <small>Visualização de Dados em Tempo Real</small>
+              </div>
+              <i class="fas fa-external-link-alt"></i>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+
+  <div id="diagram-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header-custom">
+        <h3 id="modal-title">Diagrama</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div id="modal-body-content" class="modal-body"></div>
+      <p id="modal-caption-text" class="modal-caption"></p>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-wave">
+      <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+        <path
+          d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"
+          class="shape-fill"></path>
+      </svg>
+    </div>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col brand-col">
+          <a href="#" class="footer-logo">Solar<span class="accent">Tracker</span></a>
+          <p class="footer-desc">
+            Sistema autónomo de rastreamento solar de eixo duplo com
+            monitorização IoT em tempo real. Desenvolvido no âmbito da
+            disciplina de LABSI.
+          </p>
+        </div>
+        <div class="footer-col authors-col">
+          <h4>Equipa de Projeto</h4>
+          <ul class="authors-list">
+            <li>
+              <i class="fas fa-user-graduate accent"></i>
+              <div>
+                <strong>Henrique Correia</strong><span> Nº 1221309</span>
+              </div>
+            </li>
+            <li>
+              <i class="fas fa-user-graduate accent"></i>
+              <div>
+                <strong>Gonçalo Teixeira</strong><span>Nº 1221368</span>
+              </div>
+            </li>
+          </ul>
+          <div class="institution-badge">
+            <i class="fas fa-university"></i> ISEP - Engenharia Eletrotécnica e de Computadores
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <div id="auth-modal" class="modal-overlay">
+    <div class="modal-content auth-content">
+      <div class="modal-header-custom">
+        <h3><i class="fas fa-lock"></i> Acesso Restrito</h3>
+        <button class="modal-close-btn" onclick="AuthModule.closeModal()">&times;</button>
+      </div>
+      <div class="auth-body">
+        <p style="margin-bottom: 20px; color: #64748b;">Esta funcionalidade requer privilégios de administrador.</p>
+
+        <div class="input-group">
+          <label>Password de Administrador</label>
+          <div class="input-wrapper-icon">
+            <i class="fas fa-key input-icon"></i>
+            <input type="password" id="auth-pass" class="modern-input pl-40" placeholder="Introduza a password..." />
+          </div>
+        </div>
+
+        <button onclick="AuthModule.login()" class="btn btn-primary mt-20" style="width:100%">
+          <i class="fas fa-unlock"></i> Desbloquear
+        </button>
+
+        <p id="auth-error" class="text-danger mt-15 text-center hidden" style="font-weight: 600;">
+          <i class="fas fa-times-circle"></i> Password incorreta!
+        </p>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/c.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://npmcdn.com/flatpickr/dist/l10n/pt.js"></script>
+
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
+  <script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+
+    window.mermaid = mermaid;
+
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: "base",
+      themeVariables: {
+        primaryColor: "#e2e8f0",
+        edgeLabelBackground: "#ffffff",
+        tertiaryColor: "#f1f5f9",
+      },
+    });
+  </script>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
