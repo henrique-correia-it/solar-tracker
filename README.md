@@ -2,13 +2,21 @@
 
 **Bare-metal ATmega328P firmware with PID control, an ESP8266 IoT gateway (MQTT + ThingSpeak), a custom KiCad PCB and a real-time web dashboard.**
 
-Academic team project for the LABSI course of the BSc in Electrical and Computer Engineering at ISEP (Instituto Superior de Engenharia do Porto), 2025/2026.
+![C](https://img.shields.io/badge/C-bare--metal_AVR-A8B9CC?logo=c&logoColor=black)
+![ESP8266](https://img.shields.io/badge/ESP8266-MQTT-E7352C?logo=espressif&logoColor=white)
+![KiCad](https://img.shields.io/badge/KiCad-PCB-314CB0?logo=kicad&logoColor=white)
+![JavaScript](https://img.shields.io/badge/Dashboard-JavaScript-F7DF1E?logo=javascript&logoColor=black)
+
+> Academic team project for the LABSI (Systems Laboratory) course, BSc in Electrical and Computer Engineering, ISEP, 2025/2026.
+> **Authors:** Henrique Correia and Gonçalo Teixeira.
 
 🌐 **Project website (live):** <http://ave.dee.isep.ipp.pt/~1221309/LABSI_site/>
 
-| Prototype | PCB |
-|---|---|
-| ![Prototype](docs/images/foto1.jpg) | ![PCB schematic](docs/images/esquematico_pcb.png) |
+| Prototype | Electronics | Wiring |
+|---|---|---|
+| ![Prototype](docs/images/foto1.jpg) | ![Prototype, side view](docs/images/foto2.jpg) | ![Breadboard with ATmega328P and ESP8266](docs/images/foto3.jpg) |
+
+![PCB schematic](docs/images/esquematico_pcb.png)
 
 ## What it does
 
@@ -108,7 +116,7 @@ THINGSPEAK_WRITE_KEY=... python bridge/app_ponte.py
 
 ## Team
 
-- **Henrique Correia** (1221309)
-- **Gonçalo Teixeira** (1221368)
+- **Henrique Correia**
+- **Gonçalo Teixeira**
 
-ISEP — Departamento de Engenharia Eletrotécnica.
+ISEP — Department of Electrical Engineering.
